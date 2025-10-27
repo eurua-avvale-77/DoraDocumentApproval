@@ -1,0 +1,245 @@
+import { AttachmentDownloadsApi } from '../../src/generated/procurement_reporting_attachments/';
+const { DateTime } = require('@sap/cds/lib/core/classes');
+
+
+async function getPurchaseRequest(req) {
+    try {
+        // Get the SOAP client for the GetFatture service
+        const myRealm = 'ania-1-t';
+        const myDestinationName = 'Ariba';
+        const uniqueAttachmentId = '123456789'
+        const responseData = await AttachmentDownloadsApi.fileDownloadWithUniqueId(uniqueAttachmentId, { realm: myRealm }).execute({ destinationName: myDestinationName });
+        getFattureService.setEndpoint(getFattureServiceEndpoint.url);
+        const { Invoices } = this.entities;
+        const { InvoicesStatus } = this.entities;
+        // Set the parameters for the GetFatture method of the sevice 
+        const param =  {
+          auth : {
+                CustomerCode: "0000001Test0024762",
+                Password: "RTYxOTY5MUY0RUY4NjFFODM1MENDOUNCM0ZGOTU3OTM="
+                },
+          paramFilter :   {
+            StateDataProcessing : 'ToDownload'
+          } 
+        };
+
+        // Invoke QueryGetElectronicInvoices method asynchronously and wait for the response, 
+        // NB 'GetElectronicInvoicesAsync' viene creato dal nostro Handler Soap, non esiste nel wsdl originale
+        const resp = await getFattureService.GetElectronicInvoicesAsync(param);
+
+        // Salvo Risposta Servizio In Tab Locale come 'Invoices'
+        const LtInvoices = [];
+       
+        //if (resp && resp[0] && resp[0].GetElectronicInvoicesResult.DatiFattura) {
+          if (resp[0].GetElectronicInvoicesResult) {                                  //V1.4 Corretto Fitro
+            resp[0].GetElectronicInvoicesResult.DatiFattura.forEach(DatiFattura => {
+                LtInvoices.push({
+                    ID            : DatiFattura.IdSdi,
+                    title         : DatiFattura.NomeFile,
+                    content       : JSON.stringify(DatiFattura),          
+                    contentType   : 'application/xml',
+                    createdAt     : new Date()
+                });
+            });
+        //V1.4 spostato chiusura IF in fondo
+        
+        // Salvo in DB Fatture Estratte, ID NomeFile e data
+        await UPSERT.into(Invoices).entries(LtInvoices);
+
+        // Map to an array of numbers
+        const sdiIds = LtInvoices.map(inv => inv.ID);
+
+        //Estraggo le fatture Salvate da Namirial
+        const LtIds = [];
+        const Ids = await SELECT.from(Invoices).columns('ID', 'title', 'createdAt').where('ID in', sdiIds); //V1.4 ripristinato Where Condition
+        //Preparo la Tabella locale come 'InvoiceStatus' per inserire in tabella
+        Ids.forEach(Ids => {
+              LtIds.push({
+                    ID            : Ids.ID,
+                    title         : Ids.title,
+                    createdAt     : Ids.createdAt,
+                    status        : 'Readed',  
+                    sendedAt      : '',
+                    message       : ''
+                });
+        })
+   
+         await UPSERT.into(InvoicesStatus).entries(LtIds);
+
+        // Map to an array of numbers
+        const sdiIds2 = LtIds.map(inv => inv.ID);
+        
+        // Set the parameters for the SetStatesDataProcessingPassiveElectronicInvoice method of the sevice 
+        const param2 =  {
+          auth : {
+                CustomerCode: "0000001Test0024762",
+                Password: "RTYxOTY5MUY0RUY4NjFFODM1MENDOUNCM0ZGOTU3OTM="
+                },
+          idSdiList :{
+                            "arr:long": sdiIds2
+                      },
+          newStateDataProcessing : 'Downloaded'
+        };
+
+        // Invoke SetStatesDataProcessingPassiveElectronicInvoice method asynchronously and wait for the response, 
+        // NB 'SetStatesDataProcessingPassiveElectronicInvoiceAsync' viene creato dal nostro Handler Soap, non esiste nel wsdl originale
+        const resp2 = await getFattureService.SetStatesDataProcessingPassiveElectronicInvoiceAsync(param2);
+      } //V1.4 Nuova Chiusura If In fondo
+
+        return LtInvoices;
+    } catch (err) {
+        req.error(err.code, err.message);
+    }
+}
+
+async function getDoraForms(req) {
+  try{
+
+    const { Invoices } = this.entities;
+    const { InvoicesStatus } = this.entities;
+    const LtInvoices = [];
+    const esito  = [];
+    const LtIds = [];
+    const LtIdsOks = [];
+
+    const LtInvoicesStatus = await SELECT.from(InvoicesStatus).where('status =', 'Readed');
+
+    //LtInvoicesStatus.forEach(InvoiceStatus => 
+      for (const InvoiceStatus of LtInvoicesStatus)
+       {
+        //Estraggo Una Fattura Per volta
+        const Invoice = await SELECT.from(Invoices).where('ID =', InvoiceStatus.ID)
+
+        //Dal campo dati fattura dovrei mappare i dati per il servizio Ariba
+        /* 
+        Logica Mapping verso Ariba       
+        */
+        
+        //Simulo chiamata ad Ariba con Funzione Pari o dispari e aggiorno tabella esiti
+
+
+        const numero = Invoice[0].ID;
+        const esito  = []
+
+                        if (Invoice[0].ID % 2 === 0) {
+                          esito.push({
+                        status    : 'AribaStored',
+                        sendedAt  : new Date(),
+                        message : '',
+                         });
+
+                          LtIdsOks.push({
+                            ID            : Invoice[0].ID
+                          }); 
+
+
+                        } else {
+                          esito.push({
+                        status    : 'AribaError',
+                        sendedAt  : '',
+                        message : 'NumeroDispari',
+                         });
+                        };
+
+
+          LtIds.push({
+            ID            : Invoice[0].ID,
+            status        : esito[0].status,
+            sendedAt      : esito[0].sendedAt,
+            message       : esito[0].message
+                }); 
+        
+
+       }
+    //)
+    
+      // Map to an array of numbers
+      const sdiIds = LtIdsOks.map(inv => inv.ID);
+
+      await UPSERT.into(InvoicesStatus).entries(LtIds);
+
+      //Aggiunta cancellazione righe tabella invoices dopo che l'esito è andato a buon fine
+
+      await DELETE.from(Invoices).where({ ID: { in: sdiIds } });
+
+  return LtIds; //V1.4 Cambiata Tabella Output
+    } catch (err) {
+        req.error(err.code, err.message);
+    }
+}
+
+async function createApproval(req) {
+  try{
+        const { Invoices } = this.entities;
+    const { InvoicesStatus } = this.entities;
+    const LtInvoices = [];
+    const esito  = [];
+    const LtIds = [];
+    const LtIdsOks = [];
+
+    const LtInvoicesStatus = await SELECT.from(InvoicesStatus).where('status =', 'AribaError');
+
+    //LtInvoicesStatus.forEach(InvoiceStatus => 
+      for (const InvoiceStatus of LtInvoicesStatus)
+       {
+        //Estraggo Una Fattura Per volta
+        const Invoice = await SELECT.from(Invoices).where('ID =', InvoiceStatus.ID)
+
+        //Dal campo dati fattura dovrei mappare i dati per il servizio Ariba
+        /* 
+        Logica Mapping verso Ariba       
+        */
+        
+        //Simulo chiamata ad Ariba con Funzione Pari o dispari e aggiorno tabella esiti
+
+
+        //const numero = Invoice[0].ID;
+        const esito  = []
+
+                        if (Invoice[0].ID % 2 === 0) {
+                          continue
+                        } else {
+                          esito.push({
+                        status    : 'AribaStored',
+                        sendedAt  : new Date(),
+                        message : '',
+                         });
+
+                           LtIdsOks.push({
+                            ID  : Invoice[0].ID
+                          }); 
+
+                        };
+
+
+          LtIds.push({
+            ID            : Invoice[0].ID,
+            status        : esito[0].status,
+            sendedAt      : esito[0].sendedAt,
+            message     : esito[0].message
+                }); 
+        
+       }
+    //)
+    
+      // Map to an array of numbers
+      const sdiIds = LtIdsOks.map(inv => inv.ID);
+
+      await UPSERT.into(InvoicesStatus).entries(LtIds);
+
+      //Aggiunta cancellazione righe tabella invoices dopo che l'esito è andato a buon fine
+
+      await DELETE.from(Invoices).where({ ID: { in: sdiIds } });
+
+  return LtIds; //V1.4 Cambiata tabella Output
+    } catch (err) {
+        req.error(err.code, err.message);
+    }
+}
+
+
+module.exports = {
+    getPurchaseRequest,
+    getDoraForms,
+    createApproval
+}

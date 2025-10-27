@@ -14,7 +14,9 @@
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2",
-    "@sap/cds-dk": "^9"
+    "@sap/cds-dk": "^9",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "start": "cds-serve"
@@ -24,6 +26,12 @@
     "requires": {
       "[production]": {
         "auth": "xsuaa"
+      },
+      "Ariba": {
+        "kind": "odata-v2",
+        "credentials": {
+          "destination": "AribaRequisitionCustomViewDora"
+        }
       }
     }
   }

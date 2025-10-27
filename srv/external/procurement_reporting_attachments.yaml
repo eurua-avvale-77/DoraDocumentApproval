@@ -1,0 +1,243 @@
+swagger: '2.0'
+security:
+- OAuth2: []
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    description: To use this API, you need to obtain the OAuth client credentials (client ID and secret) from SAP Ariba. After that, pass these client credentials to the SAP Ariba API token endpoint to obtain an access token.
+    tokenUrl: https://{regionOauth}/oauth/token
+    flow: application
+    scopes: {}
+externalDocs:
+  description: More information is available at https://developer.ariba.com/api where you can select your region's datacenter.
+  url: https://developer.ariba.com/api
+info:
+  version: 1.0.0
+  title: Operational Reporting for Procurement - Attachment API
+  description: |-
+    The SAP Ariba Operational Reporting API for Procurement enables you to extract and report on the transactional procurement data that you need to make operational decisions, such as invoices to pay or purchase requisitions that need approval.
+    Your client application filters the particular type of data you wish to extract by specifying transaction type, time - span, transaction status, and other considerations.These filters are included in reporting view templates.
+
+    The Operational Reporting for Procurement – Attachments API can be used to retrieve attachment documents that are part of procurement approvables.
+x-sap-stateInfo:
+  state: Active
+x-sap-shortText: Download attachments of procurement documents
+host: sandbox.api.sap.com
+basePath: /ariba/api/procurement-reporting-attachments/v1/sandbox
+schemes:
+- https
+x-sap-ext-overview:
+- name: API Group
+  values:
+  - Procurement
+- name: API System Role
+  values:
+  - SAP Ariba Buying
+- name: Datacenters
+  values:
+  - US
+  - EU
+  - RU
+  - UAE
+  - KSA
+  - CN
+  - AU
+  - JP
+x-servers:
+- url: https://{region}/api/procurement-reporting-attachments/v1/{environment}
+  description: Operational Reporting for Procurement - Attachment API endpoint
+  templates:
+    region:
+      enum:
+      - openapi.ariba.com
+      - eu.openapi.ariba.com
+      - ru.openapi.ariba.com
+      - mn1.openapi.ariba.com
+      - mn2.openapi.ariba.com
+      - openapi.sapariba.cn
+      - openapi.au.cloud.ariba.com
+      - openapi.jp.cloud.ariba.com
+      default: openapi.ariba.com
+      description: The SAP Ariba region where the SAP Ariba APIs are used.
+    regionOauth:
+      enum:
+      - api.ariba.com
+      - api-eu.ariba.com
+      - api-ru.ariba.com
+      - api.mn1.ariba.com
+      - api.mn2.ariba.com
+      - api.sapariba.cn
+      - api.au.cloud.ariba.com
+      - api.jp.cloud.ariba.com
+      default: api.ariba.com
+      description: The SAP Ariba regional OAuth server associated with the region where the SAP Ariba APIs are used.
+    environment:
+      enum:
+      - sandbox
+      - prod
+      default: sandbox
+      description: Public URI Prefix for different environments, prod is Test or Production environment for Cloud Business Applications and sandbox is Mock environment with sample data. For more information, go to the SAP Ariba Developer Portal at https://developer.ariba.com.
+tags:
+- name: procurement-reporting-attachments
+  description: Operational Reporting for Procurement - Attachment API
+- name: Attachment downloads
+  description: Downloading resulted data
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /attachment/{uniqueAttachmentId}:
+    get:
+      description: To download an attachment, use this endpoint and pass the value of the uniqueAttachmentId field for the desired attachment, which you will find in the attachment's entry in the response Attachments block.
+      summary: Requests a single attachment based on its unique attachment ID
+      tags:
+      - Attachment downloads
+      operationId: FileDownloadWithUniqueId
+      produces:
+      - image/png
+      - image/gif
+      - image/jpeg
+      - image/jpg
+      - image/bmp
+      - application/txt
+      - application/xls
+      - application/xlsx
+      - application/doc
+      - application/htm
+      - application/html
+      - application/pdf
+      - application/xml
+      - application/ppt
+      - application/zip
+      - application/rtf
+      - application/ps
+      - application/csv
+      - application/docx
+      - application/pptx
+      - application/ppsx
+      - application/dotx
+      - application/potx
+      - application/sldx
+      - application/json
+      parameters:
+      - name: realm
+        in: query
+        required: true
+        type: string
+        description: Customer realm name
+      - name: uniqueAttachmentId
+        type: string
+        in: path
+        required: true
+        description: uniqueAttachmentId value which is provided as part of attachment data in sync/async API
+      responses:
+        '200':
+          description: file of attachment type allowed in ariba application
+          schema:
+            type: file
+        '403':
+          $ref: '#/responses/Forbidden'
+        '404':
+          $ref: '#/responses/Unauthorized'
+  /{queryType}/{approvableId}/attachments/{attachmentId}:
+    get:
+      description: For documents retrieved before the uniqueAttachmentId was added, you can use this endpoint to specify what attachment you wish to download using the document ID and an associated attachment ID.
+      summary: For documents retrieved before the uniqueAttachmentId field was implemented. Requests a single attachment based on its query type, approvableID, and attachment ID
+      tags:
+      - Attachment downloads
+      operationId: FileDownloadWithApprovableAndAttachmentId
+      produces:
+      - image/png
+      - image/gif
+      - image/jpeg
+      - image/jpg
+      - image/bmp
+      - application/txt
+      - application/xls
+      - application/xlsx
+      - application/doc
+      - application/htm
+      - application/html
+      - application/pdf
+      - application/xml
+      - application/ppt
+      - application/zip
+      - application/rtf
+      - application/ps
+      - application/csv
+      - application/docx
+      - application/pptx
+      - application/ppsx
+      - application/dotx
+      - application/potx
+      - application/sldx
+      - application/json
+      parameters:
+      - name: realm
+        in: query
+        required: true
+        type: string
+        description: Customer realm name
+      - name: queryType
+        type: string
+        in: path
+        required: true
+        description: specifies the document type of the historical document whose attachment you wish to retrieve. Possible values are<br/> invoices<br/> requisitions<br/> receipts<br/> directOrders<br/> copyOrders<br/> ERPOrders<br/> invoiceReconciliations<br/>
+      - name: approvableId
+        type: string
+        in: path
+        required: true
+        description: the unique identifier specifying the historical document whose attachment you wish to retrieve, which you can get from the document's UniqueName field.
+      - name: attachmentId
+        type: string
+        in: path
+        required: true
+        description: specifies which attachment you wish to retrieve from the specified document. You can get this ID from the id field of the document to which the attachment is attached.
+      responses:
+        '200':
+          description: file of attachment type allowed in ariba application
+          schema:
+            type: file
+        '403':
+          $ref: '#/responses/Forbidden'
+        '404':
+          $ref: '#/responses/Unauthorized'
+definitions:
+  ErrorView:
+    type: object
+    properties:
+      code:
+        type: string
+        example: InvalidSelectAttr
+      message:
+        type: string
+        example: Invalid select attributes
+    required:
+    - code
+    - message
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+        example: Unauthorized/API key not found
+      message:
+        type: string
+        example: Token Expired/ API Key not found
+    required:
+    - code
+    - message
+responses:
+  InvalidSelectAttributes:
+    description: The select attributes are either not whitelisted/duplicated/customized
+    schema:
+      $ref: '#/definitions/ErrorView'
+  Unauthorized:
+    description: Unauthorized request
+    schema:
+      $ref: '#/definitions/Error'
+  Forbidden:
+    description: forbidden
+    schema:
+      $ref: '#/definitions/Error'
