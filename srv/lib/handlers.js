@@ -1,15 +1,16 @@
-import { AttachmentDownloadsApi } from '../../src/generated/procurement_reporting_attachments/';
+import { OperationalProcurementSynchronousApi } from '../../src/generated/procurement_reporting_details_v2/';
 const { DateTime } = require('@sap/cds/lib/core/classes');
 
 
 async function getPurchaseRequest(req) {
     try {
-        // Get the SOAP client for the GetFatture service
-        const myRealm = 'ania-1-t';
-        const myDestinationName = 'Ariba';
-        const uniqueAttachmentId = '123456789'
-        const responseData = await AttachmentDownloadsApi.fileDownloadWithUniqueId(uniqueAttachmentId, { realm: myRealm }).execute({ destinationName: myDestinationName });
-        getFattureService.setEndpoint(getFattureServiceEndpoint.url);
+        // Call For Ariba Requisition Custom View
+   const myRealm = 'ania-1-t';
+        const myDestinationName = 'AribaRequisitionCustomViewDora';
+        //const uniqueAttachmentId = '123456789'
+        const viewTemplateName = 'RequisitionCustomViewDORA'
+        //const responseData = await AttachmentDownOperationalProcurementSynchronousApi.fileDownloadWithUniqueId(uniqueAttachmentId, { realm: myRealm }).execute({ destinationName: myDestinationName });
+        const responseData = await OperationalProcurementSynchronousApi.getDetails(viewTemplateName, { realm: myRealm }).execute({ destinationName: myDestinationName });
         const { Invoices } = this.entities;
         const { InvoicesStatus } = this.entities;
         // Set the parameters for the GetFatture method of the sevice 

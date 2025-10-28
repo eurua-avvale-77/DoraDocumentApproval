@@ -28,11 +28,19 @@
         "auth": "xsuaa"
       },
       "Ariba": {
-        "kind": "odata-v2",
+        "kind": "odata",
         "credentials": {
           "destination": "AribaRequisitionCustomViewDora"
         }
-      }
+      },
+      "destinations": {
+          "kind": "rest",
+          "binding": {
+            "type": "cf",
+            "instance": "ariba-dest",
+            "key": "ariba-dest-key"
+          }
+        }
     }
   }
 }
