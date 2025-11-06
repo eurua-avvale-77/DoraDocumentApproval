@@ -10,11 +10,14 @@
     "@sap-cloud-sdk/resilience": "^4.1.2",
     "@sap/cds": "^9",
     "@sap/xssec": "^4",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
     "express": "^4"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2",
     "@sap/cds-dk": "^9",
+    "openapi-typescript-codegen": "^0.29.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
@@ -27,20 +30,20 @@
       "[production]": {
         "auth": "xsuaa"
       },
-      "Ariba": {
+      "AribaRequisitionCustomViewDora": {
         "kind": "odata",
         "credentials": {
           "destination": "AribaRequisitionCustomViewDora"
         }
       },
       "destinations": {
-          "kind": "rest",
-          "binding": {
-            "type": "cf",
-            "instance": "ariba-dest",
-            "key": "ariba-dest-key"
-          }
+        "kind": "rest",
+        "binding": {
+          "type": "cf",
+          "instance": "ariba-dest",
+          "key": "ariba-dest-key"
         }
+      }
     }
   }
 }
