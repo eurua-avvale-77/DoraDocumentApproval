@@ -2,7 +2,8 @@
 POST http://localhost:4004/odata/v4/processor/getPurchaseRequest
 Content-Type: application/json
 ### Lancia Invio delle fatture verso Ariba
-POST http://localhost:4004/odata/v4/processor/
+POST http://localhost:4004/odata/v4/processor/getApprovables
+Content-Type: application/json
 ### Lancia Il Retry Delle Fatture verso Ariba
 POST http://localhost:4004/odata/v4/processor/
 Content-Type: application/json

@@ -55,11 +55,33 @@ async function getPurchaseRequest(req) {
     }
 }
 
-async function getDoraForms(req) {
+async function getApprovables(req) {
   try{
- 
+  // Call For Ariba Requisition Custom View
+        const { PendingApprovables } = this.entities;
+        const pendingparams = []//'realm=ania-1-t';
+        const destination = 'AribaPendingApprovables';
+        //const uniqueAttachmentId = '123456789'
+        const pendingEndpoint = "approval/v2/prod/pendingApprovables?realm=ania-1-t&$filter=user eq 'dfossati' and approvableType eq 'requisitions'"
+        const body = [];
+        const method = 'GET';
+        const apikey = 'j3yhapiWaEpssnAa4WdxtroVqKWhOIyP';
+        //const responseData = await AttachmentDownOperationalProcurementSynchronousApi.fileDownloadWithUniqueId(uniqueAttachmentId, { realm: myRealm }).execute({ destinationName: myDestinationName });
+        const Pending = await apiRequest(destination, method, pendingEndpoint , body, pendingparams, apikey );
     
-  
+        const LtApprovables = [];
+        
+        if (Pending.Records) {                               
+            Pending.Records.forEach(Pending => {
+                LtApprovables.push({
+                    approvableId     : Pending.approvableId,
+                    approvableUniqueName  : Pending.approvableUniqueName,
+                });
+            });
+          };
+
+        await UPSERT.into(PendingApprovables).entries(LtApprovables);
+
   return LtIds; 
     } catch (err) {
         req.error(err.code, err.message);
@@ -78,6 +100,6 @@ async function createApproval(req) {
 
 module.exports = {
     getPurchaseRequest,
-    getDoraForms,
+    getApprovables,
     createApproval
 }

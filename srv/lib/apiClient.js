@@ -74,6 +74,7 @@ export async function apiRequest(destination, method, endpoint, data = null, par
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
+      "Accept": "*/*",
       apiKey : apikey
     },
     data,

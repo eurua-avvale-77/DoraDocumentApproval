@@ -4,7 +4,7 @@ const {
     getPurchaseRequest
 } = require('./lib/handlers');
 const {
-    getDoraForms
+    getApprovables
 } = require('./lib/handlers');
 const {
     createApproval
@@ -20,7 +20,7 @@ module.exports = cds.service.impl(async function (srv) {
 
     /*** HANDLERS REGISTRATION ***/
     this.on('getPurchaseRequest', getPurchaseRequest);
-    this.on('getDoraForms', getDoraForms);
+    this.on('getApprovables', getApprovables);
     this.on('createApproval', createApproval);
 
 });

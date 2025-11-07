@@ -11,7 +11,7 @@ entity DoraForms {
   ApprovedState  : String;
   };
 
-entity PendingApprovables . managed {
+entity PendingApprovables: managed {
  key approvableId         : String;
      approvableUniqueName : String;
      /*createdAt     : Timestamp;         

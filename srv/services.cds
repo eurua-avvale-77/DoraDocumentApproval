@@ -14,7 +14,7 @@ service ProcessorService {
     entity PendingApprovables as projection on my.PendingApprovables;
     
     action getPurchaseRequest() returns PurchaseRequests;
-    action getDoraForms() returns DoraForms;
+    action getApprovables() returns DoraForms;
     action createApproval() returns PendingApprovables;
 }
 
@@ -27,6 +27,6 @@ service AdminService {
     entity PendingApprovables as projection on my.PendingApprovables;
     
     action getPurchaseRequest() returns PurchaseRequests;
-    action getDoraForms() returns DoraForms;
+    action getApprovables() returns DoraForms;
     action createApproval() returns PendingApprovables;
     }
