@@ -7,6 +7,8 @@ async function getPurchaseRequest(req) {
 
     try {
         // Call For Ariba Requisition Custom View
+        const { PurchaseRequests } = this.entities;
+        const { DoraForms} = this.entities;
         const procuremtentparams = []//'realm=ania-1-t';
         const formparams = []//'$filter= ApprovedState eq 1';
         const destination = 'AribaRequisitionCustomViewDora';
@@ -17,10 +19,36 @@ async function getPurchaseRequest(req) {
         const method = 'GET';
         const apikey = 'u1V2UNOXqCQJQYWdlXlMut0uavLOE2A8';
         //const responseData = await AttachmentDownOperationalProcurementSynchronousApi.fileDownloadWithUniqueId(uniqueAttachmentId, { realm: myRealm }).execute({ destinationName: myDestinationName });
-        const Requisitions = await apiRequest(method, procuremtentEndpoint , body, procuremtentparams, apikey );
+        const Requisitions = await apiRequest(destination,method, procuremtentEndpoint , body, procuremtentparams, apikey );
        // const responseData = await OperationalProcurementSynchronousApi.getDetails(viewTemplateName, { realm: myRealm }).execute({ destinationName: myDestinationName });
-        const Forms = await apiRequest(method, formsEndpoint , body, formparams, apikey );
+        const Forms = await apiRequest(destination, method, formsEndpoint , body, formparams, apikey );
+        
+        const LtRequisitions = [];
+        const LtForms = [];
+        
+            if (Requisitions.Records) {                               
+            Requisitions.Records.forEach(Requisition => {
+                LtRequisitions.push({
+                    UniqueName     : Requisition.UniqueName,
+                    ApprovedState  : Requisition.ApprovedState,
+                    DoraFormID     : Requisition.DoraFormID,
+                });
+            });
+          };
 
+            if (Forms.Records) {                                  
+            Forms.Records.forEach(Form => {
+                LtForms.push({
+                    UniqueName     : Form.UniqueName,
+                    ApprovedState  : Form.ApprovedState,  
+                });
+            });
+          };
+      
+           await UPSERT.into(PurchaseRequests).entries(LtRequisitions);
+           await UPSERT.into(DoraForms).entries(LtForms);
+
+           return LtForms, LtRequisitions;
 
     } catch (err) {
         req.error(err.code, err.message);
@@ -29,9 +57,10 @@ async function getPurchaseRequest(req) {
 
 async function getDoraForms(req) {
   try{
-
+ 
+    
   
-  return LtIds; //V1.4 Cambiata Tabella Output
+  return LtIds; 
     } catch (err) {
         req.error(err.code, err.message);
     }
@@ -39,8 +68,8 @@ async function getDoraForms(req) {
 
 async function createApproval(req) {
   try{
-
-  return LtIds; //V1.4 Cambiata tabella Output
+   
+  return LtIds; 
     } catch (err) {
         req.error(err.code, err.message);
     }

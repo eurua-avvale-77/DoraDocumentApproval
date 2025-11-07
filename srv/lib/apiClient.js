@@ -15,34 +15,38 @@ dotenv.config();
  * CLIENT_SECRET=your-client-secret
  * SCOPE=your-scope
  */
+const connectivity = require('@sap-cloud-sdk/connectivity');
 const API_BASE_URL = process.env.API_BASE_URL;
 const AUTH_URL = process.env.AUTH_URL;
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const SCOPE = process.env.SCOPE;
 
+
+
 let accessToken = null;
 let tokenExpiry = null;
+let dest = null;
 
 /**
  * Get or refresh access token
  */
-async function getAccessToken() {
+async function getAccessToken(destination) {
   const now = Date.now();
-
+  dest = await connectivity.getDestination({destinationName: destination });
   // If valid token exists, reuse it
-  if (accessToken && tokenExpiry && now < tokenExpiry) {
+  if (dest.authTokens[0].value && dest.authTokens[0].expiresIn && now < dest.authTokens[0].expiresIn) {
     return accessToken;
   }
 
   console.log("🔐 Fetching new access token...");
 
   const response = await axios.post(
-    AUTH_URL,
+    dest.tokenServiceUrl,
     new URLSearchParams({
       grant_type: "client_credentials",
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
+      client_id: dest.clientId,
+      client_secret: dest.clientSecret,
       //scope: SCOPE,
     }),
     {
@@ -61,12 +65,12 @@ async function getAccessToken() {
 /**
  * Generic API call function
  */
-export async function apiRequest(method, endpoint, data = null, params = null, apikey) {
-  const token = await getAccessToken();
+export async function apiRequest(destination, method, endpoint, data = null, params = null, apikey) {
+  const token = await getAccessToken(destination);
 
   const config = {
     method,
-    url: `${API_BASE_URL}${endpoint}`,
+    url: `${dest.url}${endpoint}`,
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",

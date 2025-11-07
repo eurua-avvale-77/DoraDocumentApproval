@@ -13,7 +13,7 @@ const {
 module.exports = cds.service.impl(async function (srv) {
     /*** SERVICE ENTITIES ***/
     const {
-        PurchaseReqests,
+        PurchaseRequests,
         DoraForms,
         PendingApprovables
     } = this.entities;

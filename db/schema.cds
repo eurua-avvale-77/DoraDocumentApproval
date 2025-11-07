@@ -1,22 +1,22 @@
-using { cuid } from '@sap/cds/common'; 
+using { cuid, managed } from '@sap/cds/common'; 
 namespace sap.ania.DoraDocumentAppr;
 
-entity PurchaseReqests {
+entity PurchaseRequests {
   key UniqueName : String;
   ApprovedState  : String;
   DoraFormID     : LargeString;          
 }
-entity DoraForms : cuid {
+entity DoraForms {
  key UniqueName : String;
   ApprovedState  : String;
   };
 
-entity PendingApprovables : cuid {
+entity PendingApprovables . managed {
  key approvableId         : String;
      approvableUniqueName : String;
-     createdAt     : Timestamp;         
+     /*createdAt     : Timestamp;         
      status        : String;          
      sendedAt      : Timestamp;
-     message       : String;
+     message       : String;*/
   };
 
