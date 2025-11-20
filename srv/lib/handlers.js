@@ -9,12 +9,13 @@ async function getPurchaseRequest(req) {
         // Call For Ariba Requisition Custom View
         const { PurchaseRequests } = this.entities;
         const { DoraForms} = this.entities;
-        const procuremtentparams = []//'realm=ania-1-t';
-        const formparams = []//'$filter= ApprovedState eq 1';
+        const procuremtentparams = {realm : 'ania-1-t'}//'realm=ania-1-t';
+        const formparams = {realm : 'ania-1-t',
+                               $filter : "ApprovedState eq 1"}//'$filter= ApprovedState eq 1';
         const destination = 'AribaRequisitionCustomViewDora';
         //const uniqueAttachmentId = '123456789'
-        const procuremtentEndpoint = 'procurement-reporting-details/v2/prod/views/RequisitionCustomViewDORA?realm=ania-1-t'
-        const formsEndpoint = 'procurement-reporting-details/v2/prod/views/FormExtensionCustomView?realm=ania-1-t&$filter=ApprovedState eq 1'
+        const procuremtentEndpoint = 'procurement-reporting-details/v2/prod/views/RequisitionCustomViewDORA'
+        const formsEndpoint = 'procurement-reporting-details/v2/prod/views/FormExtensionCustomView'
         const body = [];
         const method = 'GET';
         const apikey = 'u1V2UNOXqCQJQYWdlXlMut0uavLOE2A8';
@@ -31,7 +32,7 @@ async function getPurchaseRequest(req) {
                 LtRequisitions.push({
                     UniqueName     : Requisition.UniqueName,
                     ApprovedState  : Requisition.ApprovedState,
-                    DoraFormID     : Requisition.DoraFormID,
+                    DoraFormID     : Requisition.cus_DoraFormCode,
                 });
             });
           };
@@ -59,10 +60,11 @@ async function getApprovables(req) {
   try{
   // Call For Ariba Requisition Custom View
         const { PendingApprovables } = this.entities;
-        const pendingparams = []//'realm=ania-1-t';
+        const pendingparams = {realm : 'ania-1-t',
+                               $filter : "user eq 'dfossati' and approvableType eq 'requisitions"}//'realm=ania-1-t'?realm=ania-1-t&$filter=user eq 'dfossati' and approvableType eq 'requisitions'";
         const destination = 'AribaPendingApprovables';
         //const uniqueAttachmentId = '123456789'
-        const pendingEndpoint = "approval/v2/prod/pendingApprovables?realm=ania-1-t&$filter=user eq 'dfossati' and approvableType eq 'requisitions'"
+        const pendingEndpoint = "approval/v2/prod/pendingApprovables"
         const body = [];
         const method = 'GET';
         const apikey = 'j3yhapiWaEpssnAa4WdxtroVqKWhOIyP';
@@ -71,8 +73,8 @@ async function getApprovables(req) {
     
         const LtApprovables = [];
         
-        if (Pending.Records) {                               
-            Pending.Records.forEach(Pending => {
+        if (Pending.value) {                               
+            Pending.value.forEach(Pending => {
                 LtApprovables.push({
                     approvableId     : Pending.approvableId,
                     approvableUniqueName  : Pending.approvableUniqueName,
@@ -82,7 +84,7 @@ async function getApprovables(req) {
 
         await UPSERT.into(PendingApprovables).entries(LtApprovables);
 
-  return LtIds; 
+  return LtApprovables; 
     } catch (err) {
         req.error(err.code, err.message);
     }
