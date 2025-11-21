@@ -9,9 +9,14 @@ async function getPurchaseRequest(req) {
         // Call For Ariba Requisition Custom View
         const { PurchaseRequests } = this.entities;
         const { DoraForms} = this.entities;
-        const procuremtentparams = {realm : 'ania-1-t'}//'realm=ania-1-t';
+        const DateInterval = {"createdDateFrom" : req.data.DateFrom,
+                              "createdDateTo" : req.data.DateTo}
+        const procfilter = DateInterval//'createdDateFrom ge ' +  req.data.DateFrom  +  ' and createdDateTo le '  + req.data.DateTo 
+        const procuremtentparams = {realm : 'ania-1-t',
+                                    filters : JSON.stringify(procfilter)}//'realm=ania-1-t';
+        const formfilter = DateInterval//'createdDateFrom ge ' + '"' + req.data.DateFrom + '"' +  ' and createdDateTo le ' + '"' + req.data.DateTo + '"'                            
         const formparams = {realm : 'ania-1-t',
-                               $filter : "ApprovedState eq 1"}//'$filter= ApprovedState eq 1';
+                               filters : JSON.stringify(formfilter)}//'$filter= ApprovedState eq 1';
         const destination = 'AribaRequisitionCustomViewDora';
         //const uniqueAttachmentId = '123456789'
         const procuremtentEndpoint = 'procurement-reporting-details/v2/prod/views/RequisitionCustomViewDORA'
@@ -27,8 +32,8 @@ async function getPurchaseRequest(req) {
         const LtRequisitions = [];
         const LtForms = [];
         
-            if (Requisitions.Records) {                               
-            Requisitions.Records.forEach(Requisition => {
+            if (Requisitions) {                               
+            Requisitions.forEach(Requisition => {
                 LtRequisitions.push({
                     UniqueName     : Requisition.UniqueName,
                     ApprovedState  : Requisition.ApprovedState,
@@ -37,8 +42,8 @@ async function getPurchaseRequest(req) {
             });
           };
 
-            if (Forms.Records) {                                  
-            Forms.Records.forEach(Form => {
+            if (Forms) {                                  
+            Forms.forEach(Form => {
                 LtForms.push({
                     UniqueName     : Form.UniqueName,
                     ApprovedState  : Form.ApprovedState,  

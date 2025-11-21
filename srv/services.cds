@@ -13,7 +13,9 @@ service ProcessorService {
     entity DoraForms as projection on my.DoraForms;
     entity PendingApprovables as projection on my.PendingApprovables;
     
-    action getPurchaseRequest() returns PurchaseRequests;
+    action getPurchaseRequest( 
+        DateFrom : DateTime,
+        DateTo   : DateTime) returns PurchaseRequests;
     action getApprovables() returns DoraForms;
     action createApproval() returns PendingApprovables;
 }
@@ -26,7 +28,10 @@ service AdminService {
     entity DoraForms as projection on my.DoraForms;
     entity PendingApprovables as projection on my.PendingApprovables;
     
-    action getPurchaseRequest() returns PurchaseRequests;
+    action getPurchaseRequest(
+        DateFrom : DateTime,
+        DateTo   : DateTime
+    ) returns PurchaseRequests;
     action getApprovables() returns DoraForms;
     action createApproval() returns PendingApprovables;
     }
