@@ -3,17 +3,22 @@ POST http://localhost:4004/odata/v4/processor/getPurchaseRequest
 Content-Type: application/json
 
 {
-    "DateFrom" : "2025-11-10T00:00:00Z",
-    "DateTo"   : "2025-11-21T23:59:59Z"
+    "DateFrom" : "2025-11-21T00:00:00Z",
+    "DateTo"   : "2025-11-27T23:59:59Z"
 }
 ### Lancia Invio delle fatture verso Ariba
 POST http://localhost:4004/odata/v4/processor/getApprovables
 Content-Type: application/json
 
-{
-    "DateFrom" : "2025-11-10T00:00:00Z",
-    "DateTo"   : "2025-11-21T23:59:59Z"
-}
 ### Lancia Il Retry Delle Fatture verso Ariba
 POST http://localhost:4004/odata/v4/processor/createApproval
 Content-Type: application/json
+
+### Update Approvals con inserimento Dora Form
+PUT http://localhost:4004/odata/v4/processor/PurchaseRequests
+Content-Type: application/json
+
+{
+    "UniqueName" : "PR343",
+    "DoraFormID" : "CF3"
+}

@@ -14,9 +14,11 @@ entity DoraForms {
 entity PendingApprovables: managed {
  key approvableId         : String;
      approvableUniqueName : String;
+     status        : String;
+     message       : String;
      /*createdAt     : Timestamp;         
-     status        : String;          
+              
      sendedAt      : Timestamp;
-     message       : String;*/
+     */
   };
 

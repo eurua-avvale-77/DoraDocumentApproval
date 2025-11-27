@@ -9,8 +9,10 @@ async function getPurchaseRequest(req) {
         // Call For Ariba Requisition Custom View
         const { PurchaseRequests } = this.entities;
         const { DoraForms} = this.entities;
-        const DateInterval = {"createdDateFrom" : req.data.DateFrom,
-                              "createdDateTo" : req.data.DateTo}
+        const DateInterval = {"updatedDateFrom" : req.data.DateFrom,
+                              "updatedDateTo" : req.data.DateTo} /*{"createdDateFrom" : req.data.DateFrom,
+                              "createdDateTo" : req.data.DateTo}*/
+
         const procfilter = DateInterval//'createdDateFrom ge ' +  req.data.DateFrom  +  ' and createdDateTo le '  + req.data.DateTo 
         const procuremtentparams = {realm : 'ania-1-t',
                                     filters : JSON.stringify(procfilter)}//'realm=ania-1-t';
@@ -20,7 +22,7 @@ async function getPurchaseRequest(req) {
         const destination = 'AribaRequisitionCustomViewDora';
         //const uniqueAttachmentId = '123456789'
         const procuremtentEndpoint = 'procurement-reporting-details/v2/prod/views/RequisitionCustomViewDORA'
-        const formsEndpoint = 'procurement-reporting-details/v2/prod/views/FormExtensionCustomView'
+        const formsEndpoint = 'procurement-reporting-details/v2/prod/views/DynamicFormExtensionCustomView'
         const body = [];
         const method = 'GET';
         const apikey = 'u1V2UNOXqCQJQYWdlXlMut0uavLOE2A8';
@@ -66,7 +68,7 @@ async function getApprovables(req) {
   // Call For Ariba Requisition Custom View
         const { PendingApprovables } = this.entities;
         const pendingparams = {realm : 'ania-1-t',
-                               $filter : "user eq 'dfossati' and approvableType eq 'requisitions"}//'realm=ania-1-t'?realm=ania-1-t&$filter=user eq 'dfossati' and approvableType eq 'requisitions'";
+                               $filter : "user eq 'verificabtp.dora' and approvableType eq 'requisitions'"}//'realm=ania-1-t'?realm=ania-1-t&$filter=user eq 'dfossati' and approvableType eq 'requisitions'";
         const destination = 'AribaPendingApprovables';
         //const uniqueAttachmentId = '123456789'
         const pendingEndpoint = "approval/v2/prod/pendingApprovables"
@@ -78,8 +80,8 @@ async function getApprovables(req) {
     
         const LtApprovables = [];
         
-        if (Pending.value) {                               
-            Pending.value.forEach(Pending => {
+        if (Pending) {                               
+            Pending.forEach(Pending => {
                 LtApprovables.push({
                     approvableId     : Pending.approvableId,
                     approvableUniqueName  : Pending.approvableUniqueName,
@@ -97,7 +99,57 @@ async function getApprovables(req) {
 
 async function createApproval(req) {
   try{
-   
+    const { PendingApprovables } = this.entities;
+    const { PurchaseRequests } = this.entities;
+    const { DoraForms } = this.entities;
+    const Approvals = await SELECT.from(PendingApprovables)//.where('status =', 'Readed')
+    let body = [];
+
+    for (const Approval of Approvals) {
+
+        const PurchaseRequest = await SELECT.from(PurchaseRequests).where('UniqueName =', Approval.approvableUniqueName)
+
+        if (PurchaseRequest[0].DoraFormID) {
+            const DoraForm = await SELECT.from(DoraForms).where('UniqueName =', PurchaseRequest[0].DoraFormID)
+
+            if (DoraForm.ApprovedState = '4'){
+                
+              body = {
+                                "state": "approve",
+                                "comment": {
+                                            "text": "Step Dora Approvato",
+                                            "visibleToSupplier": true
+                                            }
+                             };
+            } else {
+              body = {
+                                "state": "deny",
+                                "comment": {
+                                            "text": "Assicurarsi che il questionario Dora sia stato Approvato",
+                                            "visibleToSupplier": true
+                                            }
+                             };
+            }
+         
+        } else {
+              body = {
+                                "state": "deny",
+                                "comment": {
+                                            "text": "Assicurarsi che il questionario Dora sia stato Approvato",
+                                            "visibleToSupplier": true
+                                            }
+                             };
+        }
+         const Updateparams = {realm : 'ania-1-t',
+                               user  : 'verificabtp.dora',
+                               passwordAdapter : "ThirdPartyUser"}//'realm=ania-1-t'?realm=ania-1-t&$filter=user eq 'dfossati' and approvableType eq 'requisitions'";
+         const destination = 'AribaPendingApprovables';
+                //const uniqueAttachmentId = '123456789'
+         const UpdateEndpoint = "approval/v2/prod/requisitions/"+ Approval.approvableId
+         const method = 'PATCH';
+         const apikey = 'j3yhapiWaEpssnAa4WdxtroVqKWhOIyP';
+         const ApprovableUpdate = await apiRequest(destination, method, UpdateEndpoint , body, Updateparams, apikey )
+    }
   return LtIds; 
     } catch (err) {
         req.error(err.code, err.message);
