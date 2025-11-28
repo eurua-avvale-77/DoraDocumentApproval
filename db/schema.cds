@@ -1,12 +1,12 @@
 using { cuid, managed } from '@sap/cds/common'; 
 namespace sap.ania.DoraDocumentAppr;
 
-entity PurchaseRequests {
+entity PurchaseRequests : managed {
   key UniqueName : String;
   ApprovedState  : String;
   DoraFormID     : LargeString;          
 }
-entity DoraForms {
+entity DoraForms : managed {
  key UniqueName : String;
   ApprovedState  : String;
   };

@@ -104,6 +104,10 @@ async function createApproval(req) {
     const { DoraForms } = this.entities;
     const Approvals = await SELECT.from(PendingApprovables)//.where('status =', 'Readed')
     let body = [];
+    let state = [];
+    let message = [];
+    let visibleFlag = [];
+    let LtApprovables = [];
 
     for (const Approval of Approvals) {
 
@@ -113,32 +117,18 @@ async function createApproval(req) {
             const DoraForm = await SELECT.from(DoraForms).where('UniqueName =', PurchaseRequest[0].DoraFormID)
 
             if (DoraForm.ApprovedState = '4'){
-                
-              body = {
-                                "state": "approve",
-                                "comment": {
-                                            "text": "Step Dora Approvato",
-                                            "visibleToSupplier": true
-                                            }
-                             };
+              state = "approve";
+              message =  "Step Dora Approvato";
+              visibleFlag = true
             } else {
-              body = {
-                                "state": "deny",
-                                "comment": {
-                                            "text": "Assicurarsi che il questionario Dora sia stato Approvato",
-                                            "visibleToSupplier": true
-                                            }
-                             };
+              state = "deny";
+              message =  "Assicurarsi che il questionario Dora sia stato Approvato";
+              visibleFlag = true
             }
-         
         } else {
-              body = {
-                                "state": "deny",
-                                "comment": {
-                                            "text": "Assicurarsi che il questionario Dora sia stato Approvato",
-                                            "visibleToSupplier": true
-                                            }
-                             };
+              state = "deny";
+              message =  "Assicurarsi che il questionario Dora sia stato Approvato";
+              visibleFlag = true
         }
          const Updateparams = {realm : 'ania-1-t',
                                user  : 'verificabtp.dora',
@@ -148,9 +138,36 @@ async function createApproval(req) {
          const UpdateEndpoint = "approval/v2/prod/requisitions/"+ Approval.approvableId
          const method = 'PATCH';
          const apikey = 'j3yhapiWaEpssnAa4WdxtroVqKWhOIyP';
+        body = {
+                    "state": state,
+                    "comment": {
+                                "text": message,
+                                "visibleToSupplier": visibleFlag
+                                        }
+                    };
          const ApprovableUpdate = await apiRequest(destination, method, UpdateEndpoint , body, Updateparams, apikey )
+
+          
+         LtApprovables.push({
+                    approvableId     : Approval.approvableId,
+                    approvableUniqueName  : Approval.approvableUniqueName,
+                    status: state,
+                    message : message
+                });
+
+        /* await UPDATE(PendingApprovables)
+                     .set({ status: state,
+                            message : message
+                      })
+                     .where({ UniqueName: Approval.approvableId });*/
+
+
     }
-  return LtIds; 
+  
+  await UPSERT.into(PendingApprovables).entries(LtApprovables);
+  
+  return LtApprovables; 
+  
     } catch (err) {
         req.error(err.code, err.message);
     }
