@@ -9,8 +9,29 @@ async function getPurchaseRequest(req) {
         // Call For Ariba Requisition Custom View
         const { PurchaseRequests } = this.entities;
         const { DoraForms} = this.entities;
-        const DateInterval = {"updatedDateFrom" : req.data.DateFrom,
-                              "updatedDateTo" : req.data.DateTo} /*{"createdDateFrom" : req.data.DateFrom,
+        function toIsoNoMs(date) {
+                        return date.toISOString().replace(/\.\d{3}Z$/, "Z");
+                    }
+
+        const now = new Date();
+
+        // Oggi alle 00:00 UTC
+        const updatedDateFrom = toIsoNoMs(new Date(Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate(),
+            0, 0, 0
+        )));
+
+        // Oggi alle 23:59 UTC
+        const updatedDateTo = toIsoNoMs(new Date(Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate(),
+            23, 59, 59
+        )));
+        const DateInterval = {"updatedDateFrom" : updatedDateFrom,
+                              "updatedDateTo" : updatedDateTo} /*{"createdDateFrom" : req.data.DateFrom,
                               "createdDateTo" : req.data.DateTo}*/
 
         const procfilter = DateInterval//'createdDateFrom ge ' +  req.data.DateFrom  +  ' and createdDateTo le '  + req.data.DateTo 
