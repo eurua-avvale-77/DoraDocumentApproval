@@ -1,4 +1,4 @@
-const { DateTime, action } = require('@sap/cds/lib/core/classes');
+/*const { DateTime, action } = require('@sap/cds/lib/core/classes');
 
 const {
     getPurchaseRequest
@@ -8,9 +8,12 @@ const {
 } = require('./lib/handlers');
 const {
     createApproval
-} = require('./lib/handlers');
-
-module.exports = cds.service.impl(async function (srv) {
+} = require('./lib/handlers');*/
+import { getPurchaseRequest } from './lib/handlers.js';
+import { getApprovables } from './lib/handlers.js';
+import { createApproval } from './lib/handlers.js'
+//module.exports = cds.service.impl(async function (srv) {
+export default cds.service.impl(async function (srv) {
     /*** SERVICE ENTITIES ***/
     const {
         PurchaseRequests,

@@ -1,9 +1,6 @@
-import { OperationalProcurementSynchronousApi } from '../../src/generated/procurement_reporting_details_v2/';
 import { apiRequest } from "./apiClient.js"
-const { DateTime } = require('@sap/cds/lib/core/classes');
 
-
-async function getPurchaseRequest(req) {
+export async function getPurchaseRequest(req) {
 
     try {
         // Call For Ariba Requisition Custom View
@@ -84,7 +81,7 @@ async function getPurchaseRequest(req) {
     }
 }
 
-async function getApprovables(req) {
+export async function getApprovables(req) {
   try{
   // Call For Ariba Requisition Custom View
         const { PendingApprovables } = this.entities;
@@ -118,7 +115,7 @@ async function getApprovables(req) {
     }
 }
 
-async function createApproval(req) {
+export async function createApproval(req) {
   try{
     const { PendingApprovables } = this.entities;
     const { PurchaseRequests } = this.entities;
@@ -195,8 +192,8 @@ async function createApproval(req) {
 }
 
 
-module.exports = {
+/*module.exports = {
     getPurchaseRequest,
     getApprovables,
     createApproval
-}
+}*/

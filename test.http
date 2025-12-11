@@ -22,3 +22,6 @@ Content-Type: application/json
     "UniqueName" : "PR343",
     "DoraFormID" : "CF3"
 }
+
+### Update Approvals con inserimento Dora Form
+GET http://localhost:34005/odata/v4/processor/PendingApprovables

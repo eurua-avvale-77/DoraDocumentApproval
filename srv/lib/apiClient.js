@@ -1,6 +1,7 @@
 // apiClient.js
 import axios from "axios";
 import dotenv from "dotenv";
+import connectivity from "@sap-cloud-sdk/connectivity"
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ dotenv.config();
  * CLIENT_SECRET=your-client-secret
  * SCOPE=your-scope
  */
-const connectivity = require('@sap-cloud-sdk/connectivity');
+//const connectivity = require('@sap-cloud-sdk/connectivity');
 const API_BASE_URL = process.env.API_BASE_URL;
 const AUTH_URL = process.env.AUTH_URL;
 const CLIENT_ID = process.env.CLIENT_ID;
