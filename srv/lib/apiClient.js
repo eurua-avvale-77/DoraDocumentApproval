@@ -1,7 +1,7 @@
-// apiClient.js
+import connectivity from "@sap-cloud-sdk/connectivity";
 import axios from "axios";
 import dotenv from "dotenv";
-import connectivity from "@sap-cloud-sdk/connectivity"
+import { getDestination } from "@sap-cloud-sdk/connectivity";
 
 dotenv.config();
 
@@ -34,7 +34,8 @@ let dest = null;
  */
 async function getAccessToken(destination) {
   const now = Date.now();
-  dest = await connectivity.getDestination({destinationName: destination });
+  //dest = await connectivity.getDestination({destinationName: destination });
+  dest = await getDestination({destinationName: destination });
   // If valid token exists, reuse it
   if (dest.authTokens[0].value && dest.authTokens[0].expiresIn && now < dest.authTokens[0].expiresIn) {
     return accessToken;

@@ -24,4 +24,4 @@ Content-Type: application/json
 }
 
 ### Update Approvals con inserimento Dora Form
-GET http://localhost:34005/odata/v4/processor/PendingApprovables
+GET http://localhost:4004/odata/v4/processor/PendingApprovables

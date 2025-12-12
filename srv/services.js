@@ -1,14 +1,3 @@
-/*const { DateTime, action } = require('@sap/cds/lib/core/classes');
-
-const {
-    getPurchaseRequest
-} = require('./lib/handlers');
-const {
-    getApprovables
-} = require('./lib/handlers');
-const {
-    createApproval
-} = require('./lib/handlers');*/
 import { getPurchaseRequest } from './lib/handlers.js';
 import { getApprovables } from './lib/handlers.js';
 import { createApproval } from './lib/handlers.js'
