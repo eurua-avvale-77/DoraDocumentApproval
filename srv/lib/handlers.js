@@ -120,7 +120,7 @@ export async function createApproval(req) {
     const { PendingApprovables } = this.entities;
     const { PurchaseRequests } = this.entities;
     const { DoraForms } = this.entities;
-    const Approvals = await SELECT.from(PendingApprovables)//.where('status =', 'Readed')
+    const Approvals = await SELECT.from(PendingApprovables).where('status =', null)
     let body = [];
     let state = [];
     let message = [];

@@ -17,6 +17,14 @@
       ]
     },
     {
+      "name": "Attach to a Cloud Foundry Instance on Port 9229",
+      "port": 9229,
+      "request": "attach",
+      "type": "node",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/home/vcap/app"
+    },
+    {
       "name": "Attach to local hybrid on Port 9229",
       "port": 9229,
       "request": "attach",
