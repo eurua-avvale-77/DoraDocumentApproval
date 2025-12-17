@@ -134,7 +134,7 @@ export async function createApproval(req) {
         if (PurchaseRequest[0].DoraFormID) {
             const DoraForm = await SELECT.from(DoraForms).where('UniqueName =', PurchaseRequest[0].DoraFormID)
 
-            if (DoraForm.ApprovedState = '4'){
+            if (DoraForm.ApprovedState == '4'){
               state = "approve";
               message =  "Step Dora Approvato";
               visibleFlag = true
