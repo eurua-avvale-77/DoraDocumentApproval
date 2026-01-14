@@ -1,5 +1,9 @@
 import { apiRequest } from "./apiClient.js"
 
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function getPurchaseRequest(req) {
 
     try {
@@ -46,9 +50,9 @@ export async function getPurchaseRequest(req) {
         const apikey = 'u1V2UNOXqCQJQYWdlXlMut0uavLOE2A8';
         //const responseData = await AttachmentDownOperationalProcurementSynchronousApi.fileDownloadWithUniqueId(uniqueAttachmentId, { realm: myRealm }).execute({ destinationName: myDestinationName });
         const Requisitions = await apiRequest(destination,method, procuremtentEndpoint , body, procuremtentparams, apikey );
+        await wait(5000)
        // const responseData = await OperationalProcurementSynchronousApi.getDetails(viewTemplateName, { realm: myRealm }).execute({ destinationName: myDestinationName });
         const Forms = await apiRequest(destination, method, formsEndpoint , body, formparams, apikey );
-        
         const LtRequisitions = [];
         const LtForms = [];
         
@@ -121,6 +125,7 @@ export async function createApproval(req) {
     const { PurchaseRequests } = this.entities;
     const { DoraForms } = this.entities;
     const Approvals = await SELECT.from(PendingApprovables).where('status =', null)
+    //const Approvals = await SELECT.from(PendingApprovables).where('approvableUniqueName =', 'PR517')
     let body = [];
     let state = [];
     let message = [];
@@ -131,22 +136,29 @@ export async function createApproval(req) {
 
         const PurchaseRequest = await SELECT.from(PurchaseRequests).where('UniqueName =', Approval.approvableUniqueName)
 
-        if (PurchaseRequest[0].DoraFormID) {
-            const DoraForm = await SELECT.from(DoraForms).where('UniqueName =', PurchaseRequest[0].DoraFormID)
 
-            if (DoraForm.ApprovedState == '4'){
+        //if (PurchaseRequest[0].DoraFormID) {
+        if (PurchaseRequest.length != 0) {
+            const DoraForm = await SELECT.from(DoraForms).where('UniqueName =', PurchaseRequest[0].DoraFormID)
+        
+        if(DoraForm.length != 0) {
+            if (DoraForm[0].ApprovedState == '4'){
               state = "approve";
               message =  "Step Dora Approvato";
-              visibleFlag = true
+              visibleFlag = false
             } else {
               state = "deny";
-              message =  "Assicurarsi che il questionario Dora sia stato Approvato";
-              visibleFlag = true
+              message =  "La RdA è stata respinta per assenza modulo DORA, si prega di contattare RICS o CM per approfondire";
+              visibleFlag = false
             }
         } else {
               state = "deny";
-              message =  "Assicurarsi che il questionario Dora sia stato Approvato";
-              visibleFlag = true
+              message =  "La RdA è stata respinta per assenza modulo DORA, si prega di contattare RICS o CM per approfondire";
+              visibleFlag = false
+        }} else {
+              state = "deny";
+              message =  "La RdA è stata respinta per assenza modulo DORA, si prega di contattare RICS o CM per approfondire";
+              visibleFlag = false
         }
          const Updateparams = {realm : 'ania-1-t',
                                user  : 'verificabtp.dora',
@@ -190,6 +202,7 @@ export async function createApproval(req) {
         req.error(err.code, err.message);
     }
 }
+
 
 
 /*module.exports = {
