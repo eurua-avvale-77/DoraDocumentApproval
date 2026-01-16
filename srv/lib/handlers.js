@@ -36,10 +36,10 @@ export async function getPurchaseRequest(req) {
                               "createdDateTo" : req.data.DateTo}*/
 
         const procfilter = DateInterval//'createdDateFrom ge ' +  req.data.DateFrom  +  ' and createdDateTo le '  + req.data.DateTo 
-        const procuremtentparams = {realm : 'ania-1-t',
+        const procuremtentparams = {realm : req.data.Realm,
                                     filters : JSON.stringify(procfilter)}//'realm=ania-1-t';
         const formfilter = DateInterval//'createdDateFrom ge ' + '"' + req.data.DateFrom + '"' +  ' and createdDateTo le ' + '"' + req.data.DateTo + '"'                            
-        const formparams = {realm : 'ania-1-t',
+        const formparams = {realm : req.data.Realm,
                                filters : JSON.stringify(formfilter)}//'$filter= ApprovedState eq 1';
         const destination = 'AribaRequisitionCustomViewDora';
         //const uniqueAttachmentId = '123456789'
@@ -47,7 +47,7 @@ export async function getPurchaseRequest(req) {
         const formsEndpoint = 'procurement-reporting-details/v2/prod/views/DynamicFormExtensionCustomView'
         const body = [];
         const method = 'GET';
-        const apikey = 'u1V2UNOXqCQJQYWdlXlMut0uavLOE2A8';
+        const apikey = req.data.ProcurementApiKey;
         //const responseData = await AttachmentDownOperationalProcurementSynchronousApi.fileDownloadWithUniqueId(uniqueAttachmentId, { realm: myRealm }).execute({ destinationName: myDestinationName });
         const Requisitions = await apiRequest(destination,method, procuremtentEndpoint , body, procuremtentparams, apikey );
         await wait(5000)
@@ -89,14 +89,14 @@ export async function getApprovables(req) {
   try{
   // Call For Ariba Requisition Custom View
         const { PendingApprovables } = this.entities;
-        const pendingparams = {realm : 'ania-1-t',
+        const pendingparams = {realm : req.data.Realm,
                                $filter : "user eq 'verificabtp.dora' and approvableType eq 'requisitions'"}//'realm=ania-1-t'?realm=ania-1-t&$filter=user eq 'dfossati' and approvableType eq 'requisitions'";
         const destination = 'AribaPendingApprovables';
         //const uniqueAttachmentId = '123456789'
         const pendingEndpoint = "approval/v2/prod/pendingApprovables"
         const body = [];
         const method = 'GET';
-        const apikey = 'j3yhapiWaEpssnAa4WdxtroVqKWhOIyP';
+        const apikey = req.data.ApprovalApiKey;
         //const responseData = await AttachmentDownOperationalProcurementSynchronousApi.fileDownloadWithUniqueId(uniqueAttachmentId, { realm: myRealm }).execute({ destinationName: myDestinationName });
         const Pending = await apiRequest(destination, method, pendingEndpoint , body, pendingparams, apikey );
     
@@ -160,14 +160,14 @@ export async function createApproval(req) {
               message =  "La RdA è stata respinta per assenza modulo DORA, si prega di contattare RICS o CM per approfondire";
               visibleFlag = false
         }
-         const Updateparams = {realm : 'ania-1-t',
+         const Updateparams = {realm : req.data.Realm,
                                user  : 'verificabtp.dora',
                                passwordAdapter : "ThirdPartyUser"}//'realm=ania-1-t'?realm=ania-1-t&$filter=user eq 'dfossati' and approvableType eq 'requisitions'";
          const destination = 'AribaPendingApprovables';
                 //const uniqueAttachmentId = '123456789'
          const UpdateEndpoint = "approval/v2/prod/requisitions/"+ Approval.approvableId
          const method = 'PATCH';
-         const apikey = 'j3yhapiWaEpssnAa4WdxtroVqKWhOIyP';
+         const apikey = req.data.ApprovalApiKey;
         body = {
                     "state": state,
                     "comment": {

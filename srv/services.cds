@@ -15,9 +15,13 @@ service ProcessorService {
     
     action getPurchaseRequest( 
         DateFrom : DateTime,
-        DateTo   : DateTime) returns PurchaseRequests;
-    action getApprovables() returns DoraForms;
-    action createApproval() returns PendingApprovables;
+        DateTo   : DateTime,
+        Realm    : String,
+        ProcurementApiKey   : String ) returns PurchaseRequests;
+    action getApprovables( Realm            : String,
+                           ApprovalApiKey   : String) returns DoraForms;
+    action createApproval( Realm            : String,
+                           ApprovalApiKey   : String) returns PendingApprovables;
 }
 
 /**
@@ -30,8 +34,12 @@ service AdminService {
     
     action getPurchaseRequest(
         DateFrom : DateTime,
-        DateTo   : DateTime
+        DateTo   : DateTime,
+        Realm    : String,
+        ProcurementApiKey   : String
     ) returns PurchaseRequests;
-    action getApprovables() returns DoraForms;
-    action createApproval() returns PendingApprovables;
+    action getApprovables( Realm            : String,
+                           ApprovalApiKey   : String) returns DoraForms;
+    action createApproval( Realm            : String,
+                           ApprovalApiKey   : String) returns PendingApprovables;
     }

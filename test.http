@@ -4,15 +4,28 @@ Content-Type: application/json
 
 {
     "DateFrom" : "2025-11-28T00:00:00Z",
-    "DateTo"   : "2025-11-28T23:59:59Z"
+    "DateTo"   : "2025-11-28T23:59:59Z",
+    "Realm"    : "ania-1-t",
+    "ProcurementApiKey"   : "u1V2UNOXqCQJQYWdlXlMut0uavLOE2A8"
 }
 ### Lancia Invio delle fatture verso Ariba
 POST http://localhost:4004/odata/v4/processor/getApprovables
 Content-Type: application/json
 
+{
+    "Realm"    : "ania-1-t",
+    "ApprovalApiKey"   : "u1V2UNOXqCQJQYWdlXlMut0uavLOE2A8"
+}
+
+
 ### Lancia Il Retry Delle Fatture verso Ariba
 POST http://localhost:4004/odata/v4/processor/createApproval
 Content-Type: application/json
+
+{
+    "Realm"    : "ania-1-t",
+    "ApprovalApiKey"   : "u1V2UNOXqCQJQYWdlXlMut0uavLOE2A8"
+}
 
 ### Update Approvals con inserimento Dora Form
 PUT http://localhost:4004/odata/v4/processor/PurchaseRequests
