@@ -107,6 +107,8 @@ export async function getApprovables(req) {
                 LtApprovables.push({
                     approvableId     : Pending.approvableId,
                     approvableUniqueName  : Pending.approvableUniqueName,
+                    status           : null,
+                    message          : null,
                 });
             });
           };
